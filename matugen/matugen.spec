@@ -8,17 +8,23 @@ URL:            https://github.com/InioX/matugen
 Source:         %{url}/releases/download/v%{version}/%{name}-%{version}-x86_64.tar.gz
 
 %global _description %{expand:
-A material you color generation tool with templates.}
+%{summary}.}
+
+%define _debugsource_template %{nil}
 
 %description %{_description}
 
 %prep
+%autosetup -c
+
+%build
 
 %install
 mkdir -p %{buildroot}%{_bindir}
 install -Dpm755 %{name} %{buildroot}/%{_bindir}/%{name}
 
 %files
+%license LICENSE
 %{_bindir}/%{name}
 
 %changelog
