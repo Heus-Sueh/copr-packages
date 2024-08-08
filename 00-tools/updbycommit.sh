@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euxo pipefail
+set -euox pipefail
 
 NAME=waybar
 SPEC=${NAME}-git.spec
