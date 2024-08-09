@@ -1,0 +1,49 @@
+name: Update revisions
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "45 */6 * * *"
+
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    container:
+      image: "registry.fedoraproject.org/fedora-minimal:latest"
+
+    steps:
+      - name: Cache Dependencies
+        uses: actions/cache@v3
+        with:
+          path: /var/cache/dnf
+          key: ${{ runner.os }}-dnf-cache
+
+      - name: Prepare
+        run: |
+          set -euox pipefail
+          microdnf -y install --nodocs --setopt=install_weak_deps=0 \
+            git-core rpm-build curl perl-interpreter jq rpmdevtools copr-cli parallel
+
+      - name: Copr config
+        env:
+          COPR_CONF: ${{ secrets.COPR_CONFIG }}
+        run: |
+          set -euox pipefail
+          mkdir -p ~/.config
+          echo "$COPR_CONF" > ~/.config/copr
+          if [ ! -f ~/.config/copr ]; then
+            echo "COPR configuration failed!" >&2
+            exit 1
+          fi
+
+      - uses: actions/checkout@v4
+
+      - name: Run updater
+        run: |
+          set -euox pipefail
+          git config --global --add safe.directory "$GITHUB_WORKSPACE"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          find "$GITHUB_WORKSPACE" -name "update.sh" -execdir {} \;
