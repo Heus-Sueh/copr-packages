@@ -1,31 +1,35 @@
+%define repo https://github.com/savedra1/clipse
+%global debug_package %{nil}
+
 Name:           clipse
-Version:        1.9.0
-Release:        %autorelease
-Summary:        Configurable TUI clipboard manager for Unix 
+Version:        1.0.9
+Release:        1%{?dist}
+Summary:        A configurable, TUI-based clipboard manager application written in Go
 
-License:        GPL-2.0
-URL:            https://github.com/savedra1/clipse
-Source:         %{url}/releases/download/v%{version}/%{name}-%{version}-amd64.tar.gz
+License:        MIT
+URL:            %{repo}
+Source0:        %{repo}/archive/refs/tags/v%{version}.tar.gz
 
-%global _description %{expand:
-%{summary}.}
+BuildRequires:  golang git
+Requires:	golang
 
-%define _debugsource_template %{nil}
-
-%description %{_description}
+%description
+A configurable, TUI-based clipboard manager application written in Go
 
 %prep
-%autosetup -c
+%setup -q
 
 %build
+go mod tidy
+go build -ldflags="-linkmode=external" -o %{name}
 
 %install
-mkdir -p %{buildroot}%{_bindir}
-install -Dpm755 %{name} %{buildroot}/%{_bindir}/%{name}
+# move the built binary to the user accessible binary store
+mkdir -p %{buildroot}/%{_bindir}
+install -m 0755 %{name} %{buildroot}%{_bindir}/%{name}
 
 %files
 %license LICENSE
-%changelog CHANGELOG
 %{_bindir}/%{name}
 
 %changelog
