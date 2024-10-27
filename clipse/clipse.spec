@@ -2,7 +2,7 @@
 %global debug_package %{nil}
 
 Name:           clipse
-Version:        1.0.9
+Version:        1.1.0
 Release:        1%{?dist}
 Summary:        A configurable, TUI-based clipboard manager application written in Go
 
